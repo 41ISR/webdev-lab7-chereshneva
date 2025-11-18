@@ -2,9 +2,13 @@ import { useState } from "react"
 import Button from "../../components/button"
 import Input from "../../components/input"
 import { api } from "../../api/api"
+import { Link, useNavigate } from "react-router-dom"
+import { useUserStore } from "../../store/useUserStore"
 
 const Signup = () => {
     const [error, setError] = useState("")
+    const navigate = useNavigate()
+    const { setSession } = useUserStore()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -16,16 +20,17 @@ const Signup = () => {
         }
 
         const user= {
-            username: e.target.username,
-            email: e.target.email,
-            password: e.target.password
+            username: e.target.username.value,
+            email: e.target.email.value,
+            password: e.target.password.value
         }
 
         try{
             const data = await api.registerUser(user)
-            console.log(data)
+            setSession(data.data)
+            navigate("/")
         } catch(error){
-            setError(error.message)
+            setError(error.response.data.error)
             console.log(error)
         }
         console.log(user)
@@ -44,6 +49,11 @@ const Signup = () => {
 
                     <Button>Зарегестрироваться</Button>
                 </form>
+                <div className="auth-footer">
+                    <p>
+                        <Link to={"/signin"}>Вход</Link>
+                    </p>
+                </div>
             </div>
         </div>
     )
